@@ -2,9 +2,15 @@
   "name": "smarter",
   "version": "0.0.1",
   "description": "Coder assistant",
-  "main": "index.js",
+  "bin": {
+    "smarter": "./bin/smarter"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jd-smart-fe/smarter"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "postversion": "npm publish && git push"
   },
   "keywords": [
     "cli",
