@@ -13,9 +13,13 @@
   "author": "pspgbhu",
   "license": "MIT",
   "dependencies": {
+    "chalk": "^2.3.2",
     "commander": "^2.15.1",
     "eslint": "^4.19.1",
     "eslint-config-airbnb-base": "^12.1.0",
-    "eslint-plugin-import": "^2.9.0"
+    "eslint-plugin-import": "^2.9.0",
+    "fs-extra": "^5.0.0",
+    "inquirer": "^5.2.0",
+    "ora": "^2.0.0"
   }
 }

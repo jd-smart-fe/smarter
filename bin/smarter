@@ -1,0 +1,13 @@
+#!/usr/bin/env node
+
+var program = require('commander');
+
+program
+  .version(require('../package.json').version)
+  .command('init [template]', 'Generate a project template; 生成一个项目模板')
+  .parse(process.argv);
+
+
+process.on('exit', function () {
+  console.log();
+});
