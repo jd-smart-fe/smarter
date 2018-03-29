@@ -18,7 +18,7 @@ program.on('--help', function () {
   console.log('  Examples:')
   console.log()
   console.log(chalk.gray('    # 生成一个 React 同构直出的模板'))
-  console.log('    $ smart init react-isomorphic')
+  console.log('    $ smarter init react-isomorphic')
 
   console.log()
   console.log()
