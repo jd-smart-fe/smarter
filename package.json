@@ -1,6 +1,6 @@
 {
   "name": "smarter",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Coder assistant",
   "bin": {
     "smarter": "./bin/smarter"
