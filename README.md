@@ -1,5 +1,8 @@
 # Smarter
 
+
+![npm](https://img.shields.io/npm/v/smarter.svg?style=flat-square)
+
 Smarter 是一个 CLI 工具，它提供多种方式来提升开发效率。
 
 ## Install
