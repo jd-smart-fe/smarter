@@ -1,91 +1,10 @@
 #!/usr/bin/env node
 
 var program = require('commander');
-var fs = require('fs');
-var exists = require('fs').existsSync
-var path = require('path');
-var ora = require('ora');
 var chalk = require('chalk');
-var inquirer = require('inquirer');
-var generator = require('../libs/generator');
 
-program
-  .usage('<template-name> [project-name]');
+console.log('使用 smarter create 命令来创建脚手架');
+// console.log('Init a smarter workplace; 初始化一个 smater 工作区');
 
-program.on('--help', function () {
-  console.log()
-  console.log()
-  console.log('  Examples:')
-  console.log()
-  console.log(chalk.gray('    # 生成一个 React 同构直出的模板'))
-  console.log('    $ smarter init react-isomorphic')
-
-  console.log()
-  console.log()
-  console.log('  Templates List:')
-  console.log()
-  console.log('    * react-isomorphic   React 同构直出模板')
-  console.log()
-})
-
-
-// help
-function help () {
-  program.parse(process.argv)
-  if (program.args.length < 1) return program.help()
-}
-help()
-
-
-// template name
-var template = program.args[0];
-// target dir
-var target = program.args[1];
-if(!target) {
-  target = '.';
-}
-var inplace = target == '.';
-var local = path.resolve(target);
-
-console.log();
-process.on('exit', function () {
-  console.log()
-})
-
-if (exists(local)) {
-  inquirer.prompt([{
-    type: 'confirm',
-    message: inplace ? 'Generate project in current directory?'
-      : 'Target directory exists. Continue?',
-    name: 'ok'
-  }]).then(function (answers) {
-    if (answers.ok) {
-      run()
-    }
-  });
-} else {
-  run()
-}
-
-function run () {
-
-  console.log();
-  console.log('The Template: ' + template);
-  console.log('Target Directory: ' + local);
-  console.log();
-  create(template);
-}
-
-function create (template) {
-  var spinner = ora('Downloading template');
-
-  spinner.start();
-
-  generator(template, local).then(function () {
-    spinner.stop();
-    console.log('Generate template success!');
-  }).catch(function(e) {
-    spinner.stop();
-    console.log(e);
-  });
-}
+// program
+//   .usage('<template-name> [project-name]');

@@ -4,7 +4,8 @@ var program = require('commander');
 
 program
   .version(require('../package.json').version)
-  .command('init [template]', 'Generate a project template; 生成一个项目模板')
+  // .command('init', 'Init a smarter workplace; 初始化一个 smater 工作区')
+  .command('create [template]', 'Generate a project template; 生成一个项目模板')
   .parse(process.argv);
 
 
