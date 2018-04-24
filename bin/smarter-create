@@ -25,6 +25,7 @@ program.on('--help', function () {
   console.log('  Templates List:')
   console.log()
   console.log('    * react-isomorphic   React 同构直出模板')
+  console.log('    * koa-template-ts    基于 TS 的 Koa 模板')
   console.log()
 })
 
@@ -83,9 +84,9 @@ function create (template) {
 
   generator(template, local).then(function () {
     spinner.stop();
-    console.log('Generate template success!');
+    console.log(chalk.green('Generate template success!'));
   }).catch(function(e) {
     spinner.stop();
-    console.log(e);
+    console.log(chalk.red(e));
   });
 }

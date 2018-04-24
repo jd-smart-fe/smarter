@@ -30,7 +30,9 @@ exports.gitClone = function (repo, target) {
         console.log(err);
         reject();
       }
-      resolve();
+      setTimeout(() => {
+        resolve();
+      }, 100);
     })
   });
 }
