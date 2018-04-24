@@ -1,14 +1,15 @@
 #!/usr/bin/env node
 
-var program = require('commander');
+const program = require('commander');
 
 program
   .version(require('../package.json').version)
   // .command('init', 'Init a smarter workplace; 初始化一个 smater 工作区')
-  .command('create [template]', 'Generate a project template; 生成一个项目模板')
+  .command('create [template]', '创建一个项目脚手架')
+  // .command('env [settings]', '生成各种工作区环境配置文件')
+  // .command('upload', '上传文件到服务器')
   .parse(process.argv);
 
-
-process.on('exit', function () {
+process.on('exit', () => {
   console.log();
 });

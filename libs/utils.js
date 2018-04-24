@@ -1,44 +1,43 @@
-var path = require('path');
-var exec = require('child_process').exec;
-var fs = require('fs');
+const path = require('path');
+const fs = require('fs');
+const { exec } = require('child_process');
 
-exports.isExist = function (path) {
+exports.isExist = (filepath) => {
   try {
-    fs.accessSync(path);
+    fs.accessSync(filepath);
     return true;
   } catch (e) {
     return false;
   }
-}
+};
 
 
-exports.mkdir = function (dir) {
+exports.mkdir = (dir) => {
   try {
     fs.mkdirSync(dir);
     return true;
   } catch (e) {
     return false;
   }
-}
+};
 
 
-exports.gitClone = function (repo, target) {
-  var url = `https://github.com/${repo}.git`;
+exports.gitClone = (repo, target) => {
+  const url = `https://github.com/${repo}.git`;
   return new Promise((resolve, reject) => {
-    exec(`git clone ${url} ${target}`, function (err, stdout, stderr) {
+    exec(`git clone ${url} ${target}`, (err, stdout, stderr) => {
       if (err) {
         console.log(err);
         reject();
       }
-      setTimeout(() => {
-        resolve();
-      }, 100);
-    })
+      resolve();
+    });
   });
-}
+};
 
-exports.gitPull = function(targetPath) {
-  var cmd = `git --git-dir=${path.join(targetPath, '.git')} --work-tree=${targetPath} pull`;
+
+exports.gitPull = (targetPath) => {
+  const cmd = `git --git-dir=${path.join(targetPath, '.git')} --work-tree=${targetPath} pull`;
 
   return new Promise((resolve, reject) => {
     exec(cmd, (err, stdout, stderr) => {
@@ -49,4 +48,4 @@ exports.gitPull = function(targetPath) {
       resolve();
     });
   });
-}
+};

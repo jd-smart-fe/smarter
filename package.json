@@ -26,6 +26,8 @@
     "eslint-plugin-import": "^2.9.0",
     "fs-extra": "^5.0.0",
     "inquirer": "^5.2.0",
-    "ora": "^2.0.0"
+    "ora": "^2.0.0",
+    "ssh2": "^0.6.0",
+    "tar-fs": "^1.16.0"
   }
 }

@@ -1,8 +1,9 @@
-var path = require('path');
-var os = require('os');
+const path = require('path');
+const os = require('os');
 
 // 本地的缓存文件夹
 exports.CACHE_DIR = path.resolve(os.homedir(), '.smarter');
+
 // 缓存文件夹下的模板目录
 exports.TEMPLATE_CACHE_PATH = path.resolve(exports.CACHE_DIR, 'templates');
 
