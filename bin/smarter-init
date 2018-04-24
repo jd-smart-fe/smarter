@@ -1,10 +1,19 @@
 #!/usr/bin/env node
 
-var program = require('commander');
-var chalk = require('chalk');
+/**
+ * 用 init 生成 smarter.config.js 文件
+ *
+  {
+     upload: {
+       local:
+       remote:
+       host:
+       port:
+       username:
+       password:
+     }
+  }
+ */
 
-console.log('使用 smarter create 命令来创建脚手架');
-// console.log('Init a smarter workplace; 初始化一个 smater 工作区');
-
-// program
-//   .usage('<template-name> [project-name]');
+const program = require('commander');
+const chalk = require('chalk');
