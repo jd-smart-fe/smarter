@@ -9,6 +9,6 @@ exports.TEMPLATE_CACHE_PATH = path.resolve(exports.CACHE_DIR, 'templates');
 
 // 项目脚手架的 git 库
 exports.TEMPLATE_ROPES = {
-  'react-isomorphic': 'pspgbhu/react-isomorphic',
+  rephic: 'pspgbhu/rephic',
   'koa-template-ts': 'jd-smart-fe/koa-template-ts',
 };
