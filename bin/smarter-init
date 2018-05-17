@@ -1,10 +1,92 @@
 #!/usr/bin/env node
 
-var program = require('commander');
-var chalk = require('chalk');
+const program = require('commander');
+const fs = require('fs');
+const exists = require('fs').existsSync;
+const path = require('path');
+const ora = require('ora');
+const chalk = require('chalk');
+const inquirer = require('inquirer');
+const generator = require('../libs/generator');
 
-console.log('使用 smarter create 命令来创建脚手架');
-// console.log('Init a smarter workplace; 初始化一个 smater 工作区');
+program
+  .usage('<template-name> [project-name]');
 
-// program
-//   .usage('<template-name> [project-name]');
+program.on('--help', () => {
+  console.log();
+  console.log();
+  console.log('  Examples:');
+  console.log();
+  console.log(chalk.gray('    # 生成一个 React 同构直出的模板'));
+  console.log('    $ smarter create react-isomorphic');
+
+  console.log();
+  console.log();
+  console.log('  Templates List:');
+  console.log();
+  console.log('    * react-isomorphic   React 同构直出模板');
+  console.log('    * koa-template-ts    基于 TS 的 Koa 模板');
+  console.log();
+});
+
+
+// help
+function help() {
+  program.parse(process.argv);
+  if (program.args.length < 1) return program.help();
+  return false;
+}
+help();
+
+
+// template name
+const template = program.args[0];
+// target dir
+let target = program.args[1];
+if (!target) {
+  target = '.';
+}
+const inplace = target === '.';
+const local = path.resolve(target);
+
+console.log();
+process.on('exit', () => {
+  console.log();
+});
+
+if (exists(local)) {
+  inquirer.prompt([{
+    type: 'confirm',
+    message: inplace ? 'Generate project in current directory?'
+      : 'Target directory exists. Continue?',
+    name: 'ok',
+  }]).then((answers) => {
+    if (answers.ok) {
+      run();
+    }
+  });
+} else {
+  run();
+}
+
+function run() {
+  console.log();
+  console.log('The Template: ' + template);
+  console.log('Target Directory: ' + local);
+  console.log();
+  create(template);
+}
+
+function create(_template) {
+  const spinner = ora('Downloading template');
+
+  spinner.start();
+
+  generator(_template, local).then(() => {
+    spinner.stop();
+    console.log(chalk.green('Generate template success!'));
+  }).catch((e) => {
+    spinner.stop();
+    console.log(chalk.red(e));
+  });
+}
