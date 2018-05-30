@@ -18,7 +18,7 @@ program.on('--help', () => {
   console.log('  Examples:');
   console.log();
   console.log(chalk.gray('    # 生成一个 React 同构直出的模板'));
-  console.log('    $ smarter create react-isomorphic');
+  console.log('    $ smarter init react-isomorphic');
 
   console.log();
   console.log();
@@ -26,7 +26,9 @@ program.on('--help', () => {
   console.log();
   console.log('    * react-isomorphic   React 同构直出模板');
   console.log('    * koa-template-ts    基于 TS 的 Koa 模板');
+  console.log('    * hammer-site        开发 H5 静态页面模版');
   console.log();
+
 });
 
 

@@ -11,4 +11,5 @@ exports.TEMPLATE_CACHE_PATH = path.resolve(exports.CACHE_DIR, 'templates');
 exports.TEMPLATE_ROPES = {
   rephic: 'pspgbhu/rephic',
   'koa-template-ts': 'jd-smart-fe/koa-template-ts',
+  'hammer-site': 'xieyankun/HammerSite',
 };
