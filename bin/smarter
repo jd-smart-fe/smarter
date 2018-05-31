@@ -4,9 +4,7 @@ const program = require('commander');
 
 program
   .version(require('../package.json').version)
-  .command('init [template]', '创建一个项目脚手架')
-  // .command('env [settings]', '生成各种工作区环境配置文件')
-  // .command('upload', '上传文件到服务器')
+  .command('init <template>', '创建一个项目脚手架')
   .parse(process.argv);
 
 process.on('exit', () => {

@@ -4,12 +4,5 @@ const os = require('os');
 // 本地的缓存文件夹
 exports.CACHE_DIR = path.resolve(os.homedir(), '.smarter');
 
-// 缓存文件夹下的模板目录
-exports.TEMPLATE_CACHE_PATH = path.resolve(exports.CACHE_DIR, 'templates');
-
-// 项目脚手架的 git 库
-exports.TEMPLATE_ROPES = {
-  rephic: 'pspgbhu/rephic',
-  'koa-template-ts': 'jd-smart-fe/koa-template-ts',
-  'hammer-site': 'xieyankun/HammerSite',
-};
+// 将会去这个 git 库中读取 smarter 相关资源和配置
+exports.ASSETS_ROPE = 'https://github.com/jd-smart-fe/smarter-assets.git';
