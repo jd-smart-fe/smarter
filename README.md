@@ -18,7 +18,7 @@ $ npm i -g smarter
 
 生成 React 同构直出模板
 ```bash
-$ smarter init react-isomorphic my-project  # 生成脚手架到 my-project 目录下
+$ smarter init rephic my-project  # 生成脚手架到 my-project 目录下
 ```
 
 使用 `smarter init -h` 来查看全部的脚手架列表。
