@@ -1,0 +1,16 @@
+module.exports.env_test = {
+  host: '192.168.202.48',
+  username: '...',
+  password: '...',
+  from: 'bin/',
+  to: '/export/sites/beta-smart.jd.com/nsng/smarter-upload-test/'
+}
+
+module.exports.env_b = {
+  host: '192.168.202.49',
+  username: 'static',
+  password: 'lslslaaaa',
+  from: './dist',
+  to: 'var/tem/nsng/'
+}
+

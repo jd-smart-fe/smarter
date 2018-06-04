@@ -7,6 +7,7 @@ program
   .command('init <template>', '创建一个项目脚手架')
   .command('mock', 'mock')
   .command('env <settings>', '创建项目相关配置文件')
+  .command('upload', '上传本地文件到服务器')
   .parse(process.argv);
 
 process.on('exit', () => {

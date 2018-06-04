@@ -97,6 +97,32 @@ module.exports = {
 }
 
 ```
+
+### 本地文件上传到远程服务器
+
+使用 `smarter upload [options]` 上传文件。
+[options]:
+- `-n, --name [value]` 配置文件里的某台服务器信息对象的变量名 默认为 `default`;
+- `-c --config [value]` 配置文件的文件名字 默认是 `.uploadconfig`;
+
+#### Configuration
+
+上传本地文件到远程服务器时，需要在你的项目的根目录下准备一个 `.uploadconfig` 配置文件，文件的配置项可以像下面示例这样：
+```
+// .uploadconfig
+module.exports.env_test = {
+  host: '127.0.0.1',  // remote server
+  port: 22,
+  username: '...',
+  password: '***',
+  from: './dist',
+  to: '/server/path'
+}
+```
+命令行使用：
+smarter upload -n env_test
+
+
 ## TODO
 
 参考 [这里](https://github.com/jd-smart-fe/smarter/projects/1)
