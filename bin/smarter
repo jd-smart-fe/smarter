@@ -5,11 +5,8 @@ const program = require('commander');
 program
   .version(require('../package.json').version)
   .command('init <template>', '创建一个项目脚手架')
-<<<<<<< HEAD
   .command('mock', 'mock')
-=======
-  .command('env <settings>', '创建一个项目脚手架')
->>>>>>> feat: 添加配置环境命令 smarter env
+  .command('env <settings>', '创建项目相关配置文件')
   .parse(process.argv);
 
 process.on('exit', () => {
