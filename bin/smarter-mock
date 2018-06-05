@@ -1,0 +1,83 @@
+#!/usr/bin/env node
+const path = require('path');
+const fs = require('fs');
+const mocker = require('sermock');
+const program = require('commander');
+const inquirer = require('inquirer');
+const fsExtra = require('fs-extra');
+const console = require('../utils/log');
+const { updateAssetsRepo } = require('../utils/assets');
+const { CACHE_DIR } = require('../config');
+
+const CONFIGNAME = 'smarter.mock.config.js';
+const DBNAME = 'smart.mock.db.json';
+
+const basePath = process.cwd();
+
+let updataFlag = false;
+
+program
+  .usage('<template-name> [project-name]')
+  .parse(process.argv);
+
+const createConfigJS = async () => {
+  await updateAssetsRepo();
+  updataFlag = true;
+  fsExtra.copySync(`${CACHE_DIR}/assets/config/${CONFIGNAME}`, `${basePath}/${CONFIGNAME}`);
+};
+
+const createDB = async () => {
+  if (!updataFlag) {
+    await updateAssetsRepo();
+  }
+  fsExtra.copySync(`${CACHE_DIR}/assets/config/${DBNAME}`, `${basePath}/${DBNAME}`);
+};
+
+const run = async () => {
+  const configPath = path.resolve(basePath, `./${CONFIGNAME}`);
+
+  if (!fs.existsSync(configPath)) {
+    const answers = await inquirer.prompt([
+      {
+        type: 'confirm',
+        message: `没有找到${CONFIGNAME}文件，是否要生成？`,
+        name: 'ok',
+      },
+    ]);
+    if (answers.ok) {
+      await createConfigJS();
+    } else {
+      console.error(`没有找到 ${CONFIGNAME} 文件，程序退出。`);
+      process.exit(0);
+    }
+  }
+
+  const config = require(configPath);
+
+  const dbName = config.db_file || DBNAME;
+
+  const dbPath = path.resolve(basePath, `./${dbName}`);
+
+  if (!fs.existsSync(dbName)) {
+    const answers = await inquirer.prompt([
+      {
+        type: 'confirm',
+        message: `没有找到 ${dbName} 文件，是否要生成？`,
+        name: 'ok',
+      },
+    ]);
+    if (answers.ok) {
+      await createDB();
+    } else {
+      console.warn(`没有找到 ${CONFIGNAME} 文件，程序无法支持 restful`);
+    }
+  }
+
+  config.db_file = dbPath;
+  mocker.create(config);
+
+  mocker.start();
+};
+
+run();
+

@@ -23,6 +23,10 @@ $ smarter init rephic my-project  # 生成脚手架到 my-project 目录下
 
 使用 `smarter init -h` 来查看全部的脚手架列表。
 
+### mock
+
+本地mock `smarter mock`
+
 ## TODO
 
 参考 [这里](https://github.com/jd-smart-fe/smarter/projects/1)
