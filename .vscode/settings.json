@@ -1,0 +1,15 @@
+{
+  "search.exclude": {
+    "**/node_modules": true,
+    "dist/": true,
+    "**/yarn.lock": true,
+    "**/package-lock.json": true
+  },
+  "eslint.enable": false,
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "editor.detectIndentation": false,
+  "editor.wrappingIndent": "none",
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true
+}

@@ -14,7 +14,6 @@ program
   .parse(process.argv);
 
 (() => {
-  console.log(program.args.length);
   if (program.H) {
     help();
     return;
@@ -32,8 +31,93 @@ program
     console.log('    $ smarter env editorconfig');
   }
 
-  process.on('exit', () => { });
   assets.getConfig().then(config => {
+    const argsArry = program.args;
+    const argsLength = program.args.length;
+    let argsIndex = 0;
+    // console.log('配置名称长度', argsLength);
 
+    // 添加配置文件方法
+    addConfig(program.args);
+
+    function addConfig(args) {
+      if (args.length === 1) {
+        // 一个配置项
+        const configName = args[0];
+        generateEnv(configName);
+      } else {
+        const configName = argsArry[argsIndex];
+        generateEnv(configName);
+      }
+    }
+    process.on('exit', () => {
+      console.log();
+    });
+    function generateEnv(configName) {
+      // 判断是否是vscode配置,如果是则判断是否存在.vscode文件夹
+      if (configName === 'vscode') {
+        const filepath = path.resolve(__dirname, '../.vscode');
+        try {
+          // 存在
+          fs.accessSync(filepath);
+        } catch (e) {
+          // 不存在则创建文件夹
+          fs.mkdirSync(filepath);
+        }
+      }
+      if (!configName) {
+        configName = '.';
+      }
+      const inplace = configName === '.';
+      // 本地路径，需要拼接
+      const local = path.join(__dirname, config.envConfig[configName].target);
+      if (exists(local)) {
+        // 文件存在
+        inquirer.prompt([{
+          type: 'confirm',
+          message: inplace ? 'Generate file in current directory?'
+            : configName + ' setting file exists. Continue?',
+          name: 'ok',
+        }]).then(answers => {
+          if (answers.ok) {
+            create(configName);
+          } else {
+            argsIndex++;
+            if (argsIndex < argsLength) {
+              const configNames = argsArry[argsIndex];
+              generateEnv(configNames);
+            }
+          }
+        });
+      } else {
+        // 不存在
+        create(configName);
+      }
+    }
+
+    function create(configName) {
+      // 生成 editconfig 文件
+      // 读取本地项目配置文件
+      const datas = config.envConfig[configName];
+      fs.readFile(config.envConfig[configName].source, 'utf-8', (err, data) => {
+        if (err) {
+          console.log(err);
+        } else {
+          // 覆盖或新建配置文件
+          fs.writeFile(path.join(__dirname, config.envConfig[configName].target), data, 'utf8', errs => {
+            if (err) {
+              console.log(errs);
+            } else {
+              console.log('ok');
+              argsIndex++;
+              if (argsIndex < argsLength) {
+                const configNames = argsArry[argsIndex];
+                generateEnv(configNames);
+              }
+            }
+          });
+        }
+      });
+    }
   });
 })();
