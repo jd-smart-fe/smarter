@@ -11,7 +11,7 @@ const assets = require('../utils/assets');
 
 program
   .usage('<template-name> [project-name]')
-  .option('-h', '--help', 'help')
+  .option('-h, --help', 'output usage information')
   .parse(process.argv);
 
 (() => {
@@ -26,7 +26,7 @@ program
 
   function help() {
     // return;
-    assets.getTemplatesConfig().then(list => {
+    assets.getConfig().then(config => {
       program.outputHelp();
       console.log();
       console.log();
@@ -39,9 +39,18 @@ program
       console.log('  Templates List:');
       console.log();
 
-      list.forEach(item => {
-        console.log(`    * ${item.name}  ${item.desc}`);
+      let maxLength = 0;
+
+      config.templates.forEach(item => {
+        if (item.name.length > maxLength) {
+          maxLength = item.name.length;
+        }
       });
+
+      config.templates.forEach(item => {
+        console.log(`    * ${item.name.padEnd(maxLength)}    ${item.desc}`);
+      });
+
       console.log();
       process.exit();
     });

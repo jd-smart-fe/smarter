@@ -25,11 +25,11 @@ module.exports = (template, target) => {
 
     assets
       // 从 smarter-assets 库中获取 templates 相关配置
-      .getTemplatesConfig()
+      .getConfig()
       // 从配置中找到正确的配置项
-      .then(list => {
+      .then(config => {
         let git = null;
-        list.forEach(item => {
+        config.templates.forEach(item => {
           if (git) return;
           if (item.name === template) {
             git = item.git;

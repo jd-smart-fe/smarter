@@ -5,7 +5,7 @@ const { ASSETS_ROPE, CACHE_DIR } = require('../config');
 
 const ASSETS_DIR = path.join(CACHE_DIR, 'assets');
 
-let templatesConfig = null;
+let updatedConfig = null;
 
 /**
  * 获取 smarter-assets 库下的 init 相关配置文件内容
@@ -13,23 +13,30 @@ let templatesConfig = null;
  * @returns {Promise<any[]>}
  */
 
-function getTemplatesConfig() {
-  if (templatesConfig) {
-    return Promise.resolve(templatesConfig);
+function getConfig() {
+  // 在一次 cli 命令的生命周期内，只 pull 一次就够了。
+  if (updatedConfig) {
+    return Promise.resolve(updatedConfig);
   }
 
-  return cloneAssetsRepo()
-    .then(() => readTemplatesConfig())
-    .then(templateListConfig => {
-      templatesConfig = templateListConfig;
-      return Promise.resolve(templatesConfig);
+  return updateAssetsRepo()
+    .then(() => readConfig())
+    .then(config => {
+      updatedConfig = config;
+      return Promise.resolve(config);
     })
     .catch(e => {
       throw Error(e);
     });
 }
 
-function cloneAssetsRepo() {
+/**
+ * 更新或者克隆 smarter-assets 库
+ *
+ * @returns {Promise} 资源库更新完毕后 resolve
+ */
+
+function updateAssetsRepo() {
   return new Promise(resolve => {
     if (!isExist(ASSETS_DIR)) {
       gitClone(ASSETS_ROPE, ASSETS_DIR).then(() => resolve());
@@ -41,16 +48,17 @@ function cloneAssetsRepo() {
   });
 }
 
-function readTemplatesConfig() {
+function readConfig() {
   try {
-    const templateListConfig = require(path.join(ASSETS_DIR, 'config')).templates;
-    debug('%s %o', 'readTemplatesConfig', templateListConfig);
-    return Promise.resolve(templateListConfig);
+    const config = require(path.join(ASSETS_DIR, 'config'));
+    debug('%s %o', 'readTemplatesConfig', config);
+    return Promise.resolve(config);
   } catch (error) {
     return Promise.reject(error);
   }
 }
 
 module.exports = {
-  getTemplatesConfig,
+  getConfig,
+  updateAssetsRepo,
 };
