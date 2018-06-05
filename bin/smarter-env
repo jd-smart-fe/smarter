@@ -1,0 +1,39 @@
+#!/usr/bin/env node
+
+const program = require('commander');
+const path = require('path');
+const fs = require('fs');
+const exists = require('fs').existsSync;
+const chalk = require('chalk');
+const inquirer = require('inquirer');
+const assets = require('../utils/assets');
+
+program
+  .usage('editconfig')
+  .option('-h, --help', 'output usage information')
+  .parse(process.argv);
+
+(() => {
+  console.log(program.args.length);
+  if (program.H) {
+    help();
+    return;
+  } else if (program.args.length < 1) { // 没有跟任何参数的话，也自动调用 help()
+    help();
+    return;
+  }
+
+  function help() {
+    console.log();
+    console.log();
+    console.log('  Examples:');
+    console.log();
+    console.log(chalk.gray('    # 生成一个环境配置文件'));
+    console.log('    $ smarter env editorconfig');
+  }
+
+  process.on('exit', () => { });
+  assets.getConfig().then(config => {
+
+  });
+})();
