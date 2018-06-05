@@ -1,6 +1,12 @@
 const debug = require('debug')('smarter:uitls');
 const path = require('path');
 const fs = require('fs');
+// const fsExtra = require('fs-extra');
+// const { promisify } = require('util');
+
+// const readFileSync = promisify(fs.readFileSync);
+// const readdirSync = promisify(fs.readdirSync);
+
 const { exec } = require('child_process');
 
 exports.isExist = filepath => {
@@ -64,4 +70,40 @@ exports.gitPull = targetPath => {
       resolve();
     });
   });
+};
+
+/**
+ * 私有方法
+ * @param {Array} currentDir 当前路径
+ */
+const _parentsRecursive = arr => {
+  if (arr.length === 0) {
+    return null;
+  }
+  const dirs = fs.readdirSync(`${path.sep}${arr.join(path.sep)}${path.sep}`);
+  const isProject = dirs.some(dir => dir === '.git' || dir === 'package.json');
+  const name = arr.pop();
+  if (!isProject) {
+    return _parentsRecursive(arr);
+  }
+
+  return `${path.sep}${arr.join(path.sep)}${path.sep}${name}`;
+};
+
+/**
+ * 获取项目路径
+ */
+exports.getProjectRootPath = () => {
+  const basePath = process.cwd();
+  const arr = basePath.split(path.sep).filter(item => {
+    if (item !== '') {
+      return item;
+    }
+    return false;
+  });
+  const projectRootPath = _parentsRecursive(arr);
+  if (projectRootPath) {
+    return projectRootPath;
+  }
+  return basePath;
 };
