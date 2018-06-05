@@ -58,6 +58,7 @@ module.exports = (template, target) => {
  * @param {string} [option.templatePath]  本地模板缓存地址
  * @param {string} [option.target]        生成模板的目标路径
  */
+
 function toGenerate({ git, templatePath, target }) {
   debug('%s', 'to genterate');
   return new Promise((resolve, reject) => {
