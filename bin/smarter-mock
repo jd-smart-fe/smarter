@@ -7,12 +7,13 @@ const inquirer = require('inquirer');
 const fsExtra = require('fs-extra');
 const console = require('../utils/log');
 const { updateAssetsRepo } = require('../utils/assets');
+const { getProjectRootPath } = require('../utils/utils');
 const { CACHE_DIR } = require('../config');
 
 const CONFIGNAME = 'smarter.mock.config.js';
 const DBNAME = 'smarter.mock.db.json';
 
-const basePath = process.cwd();
+const basePath = getProjectRootPath();
 
 let updataFlag = false;
 
