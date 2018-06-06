@@ -10,7 +10,7 @@ const { updateAssetsRepo } = require('../utils/assets');
 const { CACHE_DIR } = require('../config');
 
 const CONFIGNAME = 'smarter.mock.config.js';
-const DBNAME = 'smart.mock.db.json';
+const DBNAME = 'smarter.mock.db.json';
 
 const basePath = process.cwd();
 
@@ -40,7 +40,7 @@ const run = async () => {
     const answers = await inquirer.prompt([
       {
         type: 'confirm',
-        message: `没有找到${CONFIGNAME}文件，是否要生成？`,
+        message: `没有找到 ${CONFIGNAME} 文件，是否要生成？`,
         name: 'ok',
       },
     ]);
