@@ -74,7 +74,7 @@ exports.gitPull = targetPath => {
 
 /**
  * 私有方法
- * @param {Array} currentDir 当前路径
+ * @param {Array} arr 路径分割的数组
  */
 const _parentsRecursive = arr => {
   if (arr.length === 0) {
