@@ -55,22 +55,19 @@ const run = async () => {
 
   const config = require(configPath);
 
-  const dbName = config.db_file || DBNAME;
-
-  const dbPath = path.resolve(basePath, `./${dbName}`);
-
-  if (!fs.existsSync(dbName)) {
+  const dbPath = config.db_file || path.resolve(basePath, `./${DBNAME}`);
+  if (!fs.existsSync(dbPath)) {
     const answers = await inquirer.prompt([
       {
         type: 'confirm',
-        message: `没有找到 ${dbName} 文件，是否要生成？`,
+        message: `没有找到 ${DBNAME} 文件，是否要生成？`,
         name: 'ok',
       },
     ]);
     if (answers.ok) {
       await createDB();
     } else {
-      console.warn(`没有找到 ${CONFIGNAME} 文件，程序无法支持 restful`);
+      console.warn(`没有找到 ${DBNAME} 文件，程序无法支持 restful`);
     }
   }
 
