@@ -2,11 +2,12 @@
 
 const program = require('commander');
 const path = require('path');
-const fs = require('fs');
+const fs = require('fs-extra');
 const exists = require('fs').existsSync;
 const chalk = require('chalk');
 const inquirer = require('inquirer');
 const assets = require('../utils/assets');
+const utils = require('../utils/utils');
 
 program
   .usage('editconfig')
@@ -28,49 +29,31 @@ program
     console.log('  Examples:');
     console.log();
     console.log(chalk.gray('    # 生成一个环境配置文件'));
-    console.log('    $ smarter env editorconfig');
+    console.log('    $ smarter env editorconfig eslint vscode');
   }
 
   assets.getConfig().then(config => {
+
     const argsArry = program.args;
     const argsLength = program.args.length;
     let argsIndex = 0;
-    // console.log('配置名称长度', argsLength);
-
     // 添加配置文件方法
-    addConfig(program.args);
+    const configName = argsArry[argsIndex];
+    generateEnv(configName);
 
-    function addConfig(args) {
-      if (args.length === 1) {
-        // 一个配置项
-        const configName = args[0];
-        generateEnv(configName);
-      } else {
-        const configName = argsArry[argsIndex];
-        generateEnv(configName);
-      }
-    }
     process.on('exit', () => {
       console.log();
     });
+
     function generateEnv(configName) {
-      // 判断是否是vscode配置,如果是则判断是否存在.vscode文件夹
-      if (configName === 'vscode') {
-        const filepath = path.resolve(__dirname, '../.vscode');
-        try {
-          // 存在
-          fs.accessSync(filepath);
-        } catch (e) {
-          // 不存在则创建文件夹
-          fs.mkdirSync(filepath);
-        }
-      }
+      const local = path.join(utils.getProjectRootPath(), config.envConfig[configName].target);
+
       if (!configName) {
         configName = '.';
       }
+
       const inplace = configName === '.';
-      // 本地路径，需要拼接
-      const local = path.join(__dirname, config.envConfig[configName].target);
+
       if (exists(local)) {
         // 文件存在
         inquirer.prompt([{
@@ -91,6 +74,13 @@ program
         });
       } else {
         // 不存在
+        // 判断目标路径是否需要放到文件夹内
+        if (config.envConfig[configName].target.indexOf('/') >= 0) {
+          const localSub = path.dirname(local);
+          fs.mkdirp(localSub, err => {
+            console.log();
+          });
+        }
         create(configName);
       }
     }
@@ -104,7 +94,7 @@ program
           console.log(err);
         } else {
           // 覆盖或新建配置文件
-          fs.writeFile(path.join(__dirname, config.envConfig[configName].target), data, 'utf8', errs => {
+          fs.writeFile(path.join(utils.getProjectRootPath(), config.envConfig[configName].target), data, 'utf8', errs => {
             if (err) {
               console.log(errs);
             } else {
