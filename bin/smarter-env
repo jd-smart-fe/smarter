@@ -10,7 +10,7 @@ const assets = require('../utils/assets');
 const utils = require('../utils/utils');
 
 program
-  .usage('editconfig')
+  .usage('[option1 ... optionN]')
   .option('-h, --help', 'output usage information')
   .parse(process.argv);
 
@@ -24,11 +24,12 @@ program
   }
 
   function help() {
+    program.outputHelp();
     console.log();
     console.log();
     console.log('  Examples:');
     console.log();
-    console.log(chalk.gray('    # 生成一个环境配置文件'));
+    console.log(chalk.cyan('    # 生成 editorconfig eslint vscode 环境配置文件'));
     console.log('    $ smarter env editorconfig eslint vscode');
   }
 
@@ -42,7 +43,7 @@ program
     generateEnv(configName);
 
     process.on('exit', () => {
-      console.log();
+      // console.log();
     });
 
     function generateEnv(configName) {
@@ -59,7 +60,7 @@ program
         inquirer.prompt([{
           type: 'confirm',
           message: inplace ? 'Generate file in current directory?'
-            : configName + ' setting file exists. Continue?',
+            : configName + ' settings file exists. Continue?',
           name: 'ok',
         }]).then(answers => {
           if (answers.ok) {
@@ -96,9 +97,9 @@ program
           // 覆盖或新建配置文件
           fs.writeFile(path.join(utils.getProjectRootPath(), config.envConfig[configName].target), data, 'utf8', errs => {
             if (err) {
-              console.log(errs);
+              console.log(chalk.red(errs));
             } else {
-              console.log('ok');
+              console.log(chalk.green('Generate file success'));
               argsIndex++;
               if (argsIndex < argsLength) {
                 const configNames = argsArry[argsIndex];

@@ -122,6 +122,17 @@ module.exports.env_test = {
 命令行使用：
 smarter upload -n env_test
 
+### 生成环境配置文件
+
+使用 `smarter env [option1 ... optionN]` 生成环境配置文件。
+[options]:
+- `vscode` 生成 vscode 配置文件;
+- `eslint` 生成 eslint 配置文件;
+- `editorconfig` 生成 editorconfig 配置文件;
+
+命令行使用：
+`smarter env vscode` 生成 vscode 配置文件
+`smarter env eslint editorconfig` 生成 eslint、 editorconfig 配置文件
 
 ## TODO
 
