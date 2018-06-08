@@ -24,14 +24,14 @@ program
 const createConfigJS = async () => {
   await updateAssetsRepo();
   updataFlag = true;
-  fsExtra.copySync(`${CACHE_DIR}/assets/config/${CONFIGNAME}`, `${basePath}/${CONFIGNAME}`);
+  fsExtra.copySync(`${CACHE_DIR}/assets/assets/mock/${CONFIGNAME}`, `${basePath}/${CONFIGNAME}`);
 };
 
 const createDB = async () => {
   if (!updataFlag) {
     await updateAssetsRepo();
   }
-  fsExtra.copySync(`${CACHE_DIR}/assets/config/${DBNAME}`, `${basePath}/${DBNAME}`);
+  fsExtra.copySync(`${CACHE_DIR}/assets/assets/mock/${DBNAME}`, `${basePath}/${DBNAME}`);
 };
 
 const configPath = path.resolve(basePath, `./${CONFIGNAME}`);
