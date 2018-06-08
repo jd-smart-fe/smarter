@@ -96,16 +96,31 @@ program
     create(template);
   }
 
-  function create(_template) {
+  function createdTips() {
+    assets.getConfig().then(config => {
+      console.log('#', chalk.green('Project initialization finished!'));
+      console.log('# ========================');
+      console.log();
+      console.log('To get started:');
+      console.log();
+      if (!inplace) {
+        console.log(chalk.yellow(`cd ${target}`));
+      }
+      console.log(chalk.yellow('npm install (or if using yarn: yarn)'));
+      console.log(chalk.yellow( config.templates.devScript || 'npm run dev'));
+    });
+  }
+
+  function create(template) {
     const spinner = ora('Downloading template');
 
     spinner.start();
 
-    generator(_template, local)
-      .then(() => {
-        spinner.stop();
-        console.log(chalk.green('Generate template success!'));
-      })
+    generator(template, local)
+    .then(() => {
+      spinner.stop();
+      createdTips(template);
+    })
       .catch(e => {
         spinner.stop();
         console.log(chalk.red(e));
