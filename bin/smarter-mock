@@ -34,9 +34,10 @@ const createDB = async () => {
   fsExtra.copySync(`${CACHE_DIR}/assets/config/${DBNAME}`, `${basePath}/${DBNAME}`);
 };
 
-const run = async () => {
-  const configPath = path.resolve(basePath, `./${CONFIGNAME}`);
+const configPath = path.resolve(basePath, `./${CONFIGNAME}`);
 
+
+const run = async () => {
   if (!fs.existsSync(configPath)) {
     const answers = await inquirer.prompt([
       {
@@ -49,6 +50,7 @@ const run = async () => {
       await createConfigJS();
     } else {
       console.error(`没有找到 ${CONFIGNAME} 文件，程序退出。`);
+
       process.exit(0);
     }
   }
@@ -56,19 +58,9 @@ const run = async () => {
   const config = require(configPath);
 
   const dbPath = config.db_file || path.resolve(basePath, `./${DBNAME}`);
+
   if (!fs.existsSync(dbPath)) {
-    const answers = await inquirer.prompt([
-      {
-        type: 'confirm',
-        message: `没有找到 ${DBNAME} 文件，是否要生成？`,
-        name: 'ok',
-      },
-    ]);
-    if (answers.ok) {
-      await createDB();
-    } else {
-      console.warn(`没有找到 ${DBNAME} 文件，程序无法支持 restful`);
-    }
+    await createDB();
   }
 
   config.db_file = dbPath;
