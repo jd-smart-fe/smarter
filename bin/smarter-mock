@@ -51,7 +51,7 @@ const run = async () => {
     } else {
       console.error(`没有找到 ${CONFIGNAME} 文件，程序退出。`);
 
-      process.exit(0);
+      process.exit(1);
     }
   }
 
