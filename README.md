@@ -2,32 +2,40 @@
 
 ![npm](https://img.shields.io/npm/v/smarter.svg?style=flat-square)
 
-Smarter 是一个 CLI 工具，它提供多种方式来提升开发效率。
+Smarter 是一个 CLI 流程工具，它提供多种方式来提升开发效率。
 
-## Install
+## 安装
 
 ```
 $ npm i -g smarter
 ```
 
-## Usage
+## 使用
 
-### 生成脚手架
+### init: 生成脚手架
 
-使用 `smarter init <template> [project]` 来快速生成各类的脚手架。如：
+`smarter init <template> [project]` 用于快速搭建各类项目的脚手架。
 
-生成 React 同构直出模板
+e.g. 生成 React 同构直出模板
+
 ```bash
 $ smarter init rephic my-project  # 生成脚手架到 my-project 目录下
 ```
 
-使用 `smarter init -h` 来查看全部的脚手架列表。
+**查看全部支持的脚手架:** `smarter init -h`
 
-### mock
+### mock: 本地 mock API 请求
 
-使用 `smarter mock` 来启动
+`smarter mock` 用户在本地开发时 mock API 请求数据。
 
-#### smarter.mock.config
+> 运行 `smarter mock` 命令时，若本地没有 smarter.mock.config.js 的配置文件，则会自动生成一份默认的配置文件在本地。
+
+#### Configuration
+
+- `smarter.mock.config.js`
+- `smarter.mock.db.json`
+
+##### smarter.mock.config.js
 
 ```javascript
 module.exports = {
@@ -77,7 +85,9 @@ module.exports = {
 };
 
 ```
-#### smarter.mock.db.json
+
+##### smarter.mock.db.json
+
 ```javascript
 // 会根据此文件生成一个数据库支持增删改查、Restful、分页。
 // 分页查询： http://localhost:3002/list?_page=1&_size=1
@@ -98,7 +108,7 @@ module.exports = {
 
 ```
 
-### 本地文件上传到远程服务器
+### upload: 本地文件上传到远程服务器
 
 使用 `smarter upload [options]` 上传文件。
 [options]:
@@ -122,17 +132,20 @@ module.exports.env_test = {
 命令行使用：
 smarter upload -n env_test
 
-### 生成环境配置文件
+### env 生成环境配置文件
 
-使用 `smarter env [option1 ... optionN]` 生成环境配置文件。
-[options]:
-- `vscode` 生成 vscode 配置文件;
-- `eslint` 生成 eslint 配置文件;
-- `editorconfig` 生成 editorconfig 配置文件;
+`smarter env [option1 ... optionN]` 生成环境配置文件。
 
-命令行使用：
-`smarter env vscode` 生成 vscode 配置文件
-`smarter env eslint editorconfig` 生成 eslint、 editorconfig 配置文件
+- `option` 可取的值:
+  - `vscode` 生成 vscode 配置文件;
+  - `eslint` 生成 eslint 配置文件;
+  - `editorconfig` 生成 editorconfig 配置文件;
+
+e.g.
+```bash
+smarter env vscode # 生成 vscode 配置文件
+smarter env eslint editorconfig # 生成 eslint、 editorconfig 配置文件
+```
 
 ## TODO
 
