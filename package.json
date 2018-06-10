@@ -1,7 +1,7 @@
 {
   "name": "smarter",
   "version": "0.5.0",
-  "description": "Coder assistant",
+  "description": "A processes tools, to improve the efficiency of each stage of the coding process.",
   "bin": {
     "smarter": "./bin/smarter"
   },
@@ -16,6 +16,9 @@
     "cli",
     "smarter"
   ],
+  "engines": {
+    "node": ">=8.0"
+  },
   "author": "pspgbhu",
   "license": "MIT",
   "dependencies": {
