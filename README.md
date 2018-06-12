@@ -138,13 +138,41 @@ smarter upload -n env_test
 
 - `option` 可取的值:
   - `vscode` 生成 vscode 配置文件;
-  - `eslint` 生成 eslint 配置文件;
   - `editorconfig` 生成 editorconfig 配置文件;
+  - `-r [rule] -i [installer] ` 生成 eslint 配置文件
+
+### **-r [rule]**
+
+根据项目环境不同来生成不同的 eslintrc 规则文件，rule 有以下可选项：
+
+- `node` 或 `n`: 生成 nodejs 的 eslint 配置 （默认使用 node 配置）
+- `vue` 或 `v`: 生成 vue 的 eslint 配置
+- `react` 或 `r`: 生成 react 的 eslint 配置
+- `browser` 或 `b`: 生成浏览器环境通用的 eslint 配置
+
+### **-i [installer]**
+
+根据项目包管理工具的不同来选择不同的包管理器来安装依赖，installer 有以下可选项：
+
+- `npm`: 使用 npm 安装相关依赖（默认使用 npm）
+- `yarn`: 使用 yarn 安装相关依赖
+- `cnpm`: 使用 cnpm 安装相关依赖
+
+example:
+```bash
+$ smarter env -r react -i npm # 生成 react 的 eslint 配置, 并使用 npm 来安装相关依赖
+```
+
+### **--no-plugins**
+
+禁止自动安装 npm 相关依赖包，仅仅生成 `.eslintrc` 规则文件。
 
 e.g.
 ```bash
 smarter env vscode # 生成 vscode 配置文件
-smarter env eslint editorconfig # 生成 eslint、 editorconfig 配置文件
+smarter env vscode editorconfig # 生成 vscode、 editorconfig 配置文件
+smarter env -r r/react -i node # 生成 vscode、 editorconfig 配置文件
+smarter env all # 生成 vscode、 editorconfig配置文件
 ```
 
 ## TODO
