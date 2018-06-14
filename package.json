@@ -32,6 +32,9 @@
     "inquirer": "^5.2.0",
     "karrier": "^0.1.4",
     "ora": "^2.0.0",
+    "request": "^2.87.0",
+    "request-promise-native": "^1.0.5",
+    "semver": "^5.5.0",
     "sermock": "^0.2.0",
     "ssh2": "^0.6.0",
     "tar-fs": "^1.16.0"

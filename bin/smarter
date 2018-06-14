@@ -1,14 +1,40 @@
 #!/usr/bin/env node
 
 const program = require('commander');
+const path = require('path');
+const ora = require('ora');
+const chalk = require('chalk');
+const { execSync } = require('child_process');
+const { checkVersion } = require('../utils/check-version');
 
-program
-  .version(require('../package.json').version)
-  .command('init <template>', '创建一个项目脚手架')
-  .command('mock', 'mock')
-  .command('env <settings>', '创建项目相关配置文件')
-  .command('upload', '上传本地文件到服务器')
-  .parse(process.argv);
+(async () => {
+
+  // 先判断是否有新版本
+  const spinner = ora()
+  spinner.start('> check version ... ');
+
+  // checkVersion(pkg) 返回 {hasNewer:Boolean, remoteVersion, localVersion}
+  const versionInfo = await checkVersion('smarter');
+  spinner.stop();
+
+  // 如果有最新版本了 提示用户
+  if (versionInfo.hasNewer) {
+    console.log();
+    console.log(chalk.yellow(`  A newer version of ${chalk.magenta('smarter')} is available.`));
+    console.log(`  latest:       ${chalk.green(versionInfo.remoteVersion)}`);
+    console.log(`  installed:    ${chalk.green(versionInfo.localVersion)}`);
+    console.log(`  Please upgrade via the command line: ${chalk.green('npm i -g smarter')}`);
+  }
+
+  program
+    .version(require('../package.json').version)
+    .command('init <template>', '创建一个项目脚手架')
+    .command('mock', 'mock')
+    .command('env <settings>', '创建项目相关配置文件')
+    .command('upload', '上传本地文件到服务器')
+    .parse(process.argv);
+
+  })();
 
 process.on('exit', () => {
   console.log();
