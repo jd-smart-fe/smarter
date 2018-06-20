@@ -1,6 +1,7 @@
 const debug = require('debug')('smarter:uitls');
 const path = require('path');
 const fs = require('fs');
+const os = require('os');
 // const fsExtra = require('fs-extra');
 // const { promisify } = require('util');
 
@@ -80,15 +81,28 @@ const _parentsRecursive = arr => {
   if (arr.length === 0) {
     return null;
   }
-  const dirs = fs.readdirSync(`${path.sep}${arr.join(path.sep)}${path.sep}`);
+  const dirs = fs.readdirSync(_getFilePath(arr));
   const isProject = dirs.some(dir => dir === '.git' || dir === 'package.json');
   const name = arr.pop();
   if (!isProject) {
     return _parentsRecursive(arr);
   }
 
-  return `${path.sep}${arr.join(path.sep)}${path.sep}${name}`;
+  return `${_getFilePath(arr)}${name}`;
 };
+
+/**
+ * 私有方法
+ * 获取文件的完整路径，兼容windows平台
+ * @param {Array} arr
+ */
+const _getFilePath = (arr) => {
+  if(os.platform() === 'win32'){
+    return `${arr.join(path.sep)}${path.sep}`;
+  }
+  return `${path.sep}${arr.join(path.sep)}${path.sep}`;
+}
+
 
 /**
  * 获取项目路径
