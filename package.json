@@ -1,6 +1,6 @@
 {
   "name": "smarter",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "A processes tools, to improve the efficiency of each stage of the coding process.",
   "bin": {
     "smarter": "./bin/smarter"
