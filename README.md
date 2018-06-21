@@ -41,7 +41,7 @@ $ smarter init rephic my-project  # 生成脚手架到 my-project 目录下
 module.exports = {
   // 监听的端口号 默认3002 可选
   PORT: 3002,
-  // 是否浏览器缓存
+  // 是否浏览器缓存
   nocache: false,
   // 配置静态资源文件夹
   static: ['./static'],
