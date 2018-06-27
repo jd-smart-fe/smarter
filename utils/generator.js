@@ -13,41 +13,31 @@ const { CACHE_DIR } = require('../config');
  * @returns {Promise}
  */
 
-module.exports = (template, target) => {
+module.exports = async function generator(template, target) {
   const TEMPLATE_CACHE_PATH = path.join(CACHE_DIR, 'templates');
 
-  return new Promise((resolve, reject) => {
-    // 本地是否存在存放模板的文件夹，不存在则初始化一个
-    fs.mkdirsSync(TEMPLATE_CACHE_PATH);
+  // 本地是否存在存放模板的文件夹，不存在则初始化一个
+  fs.mkdirsSync(TEMPLATE_CACHE_PATH);
 
-    // 本地脚手架的缓存目录
-    const templatePath = path.resolve(TEMPLATE_CACHE_PATH, template);
+  // 本地脚手架的缓存目录
+  const templatePath = path.resolve(TEMPLATE_CACHE_PATH, template);
+  const config = await assets.getConfig();
 
-    assets
-      // 从 smarter-assets 库中获取 templates 相关配置
-      .getConfig()
-      // 从配置中找到正确的配置项
-      .then(config => {
-        let git = null;
-        config.templates.forEach(item => {
-          if (git) return;
-          if (item.name === template) {
-            git = item.git;
-          }
-        });
-
-        debug('%s %o', 'find template git', git);
-
-        if (git) {
-          return Promise.resolve(git);
-        }
-        return Promise.reject(Error(`The "${template}" template not found!`));
-      })
-      // 生成模板
-      .then(git => toGenerate({ git, templatePath, target }))
-      .then(() => resolve())
-      .catch(e => reject(Error(e)));
+  let git = null;
+  config.templates.forEach(item => {
+    if (git) return;
+    if (item.name === template) {
+      git = item.git;
+    }
   });
+
+  debug('%s %o', 'find template git', git);
+
+  if (!git) {
+    throw new Error(`The "${template}" template not found!`);
+  }
+
+  await toGenerate({ git, templatePath, target });
 };
 
 /**
@@ -59,23 +49,18 @@ module.exports = (template, target) => {
  * @param {string} [option.target]        生成模板的目标路径
  */
 
-function toGenerate({ git, templatePath, target }) {
+async function toGenerate({ git, templatePath, target }) {
   debug('%s', 'to genterate');
-  return new Promise((resolve, reject) => {
-    // 如果本地缓存没有对应的模板
-    if (!utils.isExist(templatePath)) {
-      utils
-        .gitClone(git, templatePath)
-        .then(() => copyTemplate(templatePath, target))
-        .then(() => resolve())
-        .catch(e => reject(e));
-      // 如果本地缓存中已有该模板
-    } else {
-      copyTemplate(templatePath, target)
-        .then(() => resolve())
-        .catch(e => reject(e));
-    }
-  });
+
+  // 如果本地缓存没有对应的模板
+  if (!utils.isExist(templatePath)) {
+    await utils.gitClone(git, templatePath);
+    await copyTemplate(templatePath, target);
+    return;
+  }
+
+  // 如果本地缓存中已有该模板
+  await copyTemplate(templatePath, target);
 }
 
 /**
@@ -86,30 +71,24 @@ function toGenerate({ git, templatePath, target }) {
  * @returns {Promise}
  */
 
-function copyTemplate(templatePath, target) {
+async function copyTemplate(templatePath, target) {
   debug('%s %o', 'templatePath:', templatePath);
   // 必须要求是绝对路径
   if (!path.isAbsolute(target)) {
     throw new Error('It is not absolute path!');
   }
 
-  return new Promise((resolve, reject) => {
-    if (!utils.isExist(templatePath)) {
-      reject(new Error('Please pass in the correct template name!'));
-    }
+  if (!utils.isExist(templatePath)) {
+    throw new Error('Please pass in the correct template name!');
+  }
 
-    utils
-      .gitPull(templatePath)
-      // 将整个目录复制过去
-      .then(() => fs.copy(templatePath, target))
-      .then(() => new Promise((_resolve, _reject) => {
-        // 删除复制过去的 .git 文件夹
-        fs.remove(path.resolve(target, '.git'), err => {
-          if (err) return _reject(err);
-          return _resolve();
-        });
-      }))
-      .then(() => resolve())
-      .catch(e => reject(e));
+  await utils.gitPull(templatePath);
+  await fs.copy(templatePath, target);
+  await new Promise((resolve, reject) => {
+    // 删除复制过去的 .git 文件夹
+    fs.remove(path.resolve(target, '.git'), err => {
+      if (err) return reject(err);
+      return resolve();
+    });
   });
 }

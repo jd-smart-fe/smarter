@@ -2,12 +2,6 @@ const debug = require('debug')('smarter:uitls');
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
-// const fsExtra = require('fs-extra');
-// const { promisify } = require('util');
-
-// const readFileSync = promisify(fs.readFileSync);
-// const readdirSync = promisify(fs.readdirSync);
-
 const { exec } = require('child_process');
 
 exports.isExist = filepath => {
@@ -38,16 +32,17 @@ exports.mkdir = dir => {
  * @returns {Promise<void>}
  */
 
-exports.gitClone = (git, target = '') => new Promise((resolve, reject) => {
-  exec(`git clone ${git} ${target}`, (err, stdout, stderr) => {
-    if (err) {
-      console.log(err);
-      reject();
-    }
-    debug('%s', 'clone done!');
-    resolve();
+exports.gitClone = async (git, target = '') => {
+  await new Promise((resolve, reject) => {
+    exec(`git clone ${git} ${target}`, (err, stdout, stderr) => {
+      if (err) {
+        reject(Error(err));
+      }
+      debug('%s', 'clone done!');
+      resolve();
+    });
   });
-});
+}
 
 /**
  * git pull
@@ -56,13 +51,13 @@ exports.gitClone = (git, target = '') => new Promise((resolve, reject) => {
  * @returns {Promise<void>}
  */
 
-exports.gitPull = targetPath => {
+exports.gitPull = async targetPath => {
   const cmd = `git --git-dir=${path.join(
     targetPath,
     '.git',
   )} --work-tree=${targetPath} pull`;
 
-  return new Promise((resolve, reject) => {
+  await new Promise((resolve, reject) => {
     exec(cmd, (err, stdout, stderr) => {
       if (err) {
         reject(err);

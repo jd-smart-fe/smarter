@@ -14,50 +14,19 @@ program
   .option('-h, --help', 'output usage information')
   .parse(process.argv);
 
-(() => {
+(async () => {
   // 如果用户输入的是 init -h
   if (program.H) {
-    help();
+    await help();
     return;
   } else if (program.args.length < 1) { // 没有跟任何参数的话，也自动调用 help()
-    help();
+    await help();
     return;
-  }
-
-  function help() {
-    // return;
-    assets.getConfig().then(config => {
-      program.outputHelp();
-      console.log();
-      console.log();
-      console.log('  Examples:');
-      console.log();
-      console.log(chalk.cyan('    # 生成一个 React 同构直出的脚手架'));
-      console.log('    $ smarter init rephic project-dir');
-      console.log();
-      console.log();
-      console.log('  Templates List:');
-      console.log();
-
-      let maxLength = 0;
-
-      config.templates.forEach(item => {
-        if (item.name.length > maxLength) {
-          maxLength = item.name.length;
-        }
-      });
-
-      config.templates.forEach(item => {
-        console.log(`    * ${item.name.padEnd(maxLength)}    ${item.desc}`);
-      });
-
-      console.log();
-      process.exit();
-    });
   }
 
   // template name
   const template = program.args[0];
+
   // target dir
   let target = program.args[1];
   if (!target) {
@@ -66,19 +35,16 @@ program
   const inplace = target === '.';
   const local = path.resolve(target);
 
-  process.on('exit', () => { });
+  process.on('exit', () => {});
 
   if (exists(local)) {
     inquirer
-      .prompt([
-        {
-          type: 'confirm',
-          message: inplace
-            ? 'Generate project in current directory?'
-            : 'Target directory exists. Continue?',
-          name: 'ok',
-        },
-      ])
+      .prompt([{
+        type: 'confirm',
+        message: inplace ?
+          'Generate project in current directory?' : 'Target directory exists. Continue?',
+        name: 'ok',
+      }, ])
       .then(answers => {
         if (answers.ok) {
           run();
@@ -88,42 +54,73 @@ program
     run();
   }
 
-  function run() {
+  async function run() {
     console.log();
     console.log('The Template: ' + template);
     console.log('Target Directory: ' + local);
     console.log();
-    create(template);
-  }
-
-  function createdTips() {
-    assets.getConfig().then(config => {
-      console.log('#', chalk.green('Project initialization finished!'));
-      console.log('# ========================');
-      console.log();
-      console.log('To get started:');
-      console.log();
-      if (!inplace) {
-        console.log(chalk.yellow(`cd ${target}`));
-      }
-      console.log(chalk.yellow('npm install (or if using yarn: yarn)'));
-      console.log(chalk.yellow( config.templates.devScript || 'npm run dev'));
-    });
-  }
-
-  function create(template) {
-    const spinner = ora('Downloading template');
-
-    spinner.start();
-
-    generator(template, local)
-    .then(() => {
-      spinner.stop();
-      createdTips(template);
-    })
-      .catch(e => {
-        spinner.stop();
-        console.log(chalk.red(e));
-      });
+    await create(template, target, local, inplace);
   }
 })();
+
+
+async function help() {
+  // return;
+  const config = await assets.getConfig();
+
+  program.outputHelp();
+  console.log();
+  console.log();
+  console.log('  Examples:');
+  console.log();
+  console.log(chalk.cyan('    # 生成一个 React 同构直出的脚手架'));
+  console.log('    $ smarter init rephic project-dir');
+  console.log();
+  console.log();
+  console.log('  Templates List:');
+  console.log();
+
+  let maxLength = 0;
+
+  config.templates.forEach(item => {
+    if (item.name.length > maxLength) {
+      maxLength = item.name.length;
+    }
+  });
+
+  config.templates.forEach(item => {
+    console.log(`    * ${item.name.padEnd(maxLength)}    ${item.desc}`);
+  });
+
+  console.log();
+  process.exit();
+}
+
+async function create(template, target, local, inplace) {
+  const spinner = ora('Downloading template');
+  spinner.start();
+
+  try {
+    await generator(template, local);
+    spinner.stop();
+    await createdTips(target, inplace);
+  } catch (error) {
+    console.log(error);
+    spinner.stop();
+  }
+}
+
+async function createdTips(target, inplace) {
+  const config = await assets.getConfig()
+
+  console.log('#', chalk.green('Project initialization finished!'));
+  console.log('# ========================');
+  console.log();
+  console.log('To get started:');
+  console.log();
+  if (!inplace) {
+    console.log(chalk.yellow(`cd ${target}`));
+  }
+  console.log(chalk.yellow('npm install (or if using yarn: yarn)'));
+  console.log(chalk.yellow(config.templates.devScript || 'npm run dev'));
+}

@@ -11,21 +11,14 @@ let updatedConfig = null;
  * @returns {Promise<any[]>}
  */
 
-function getConfig() {
+exports.getConfig = async () => {
   // 在一次 cli 命令的生命周期内，只 pull 一次就够了。
   if (updatedConfig) {
-    return Promise.resolve(updatedConfig);
+    return updatedConfig;
   }
+  await exports.updateAssetsRepo();
 
-  return updateAssetsRepo()
-    .then(() => readConfig())
-    .then(config => {
-      updatedConfig = config;
-      return Promise.resolve(config);
-    })
-    .catch(e => {
-      throw Error(e);
-    });
+  return readConfig();
 }
 
 /**
@@ -34,29 +27,16 @@ function getConfig() {
  * @returns {Promise} 资源库更新完毕后 resolve
  */
 
-function updateAssetsRepo() {
-  return new Promise(resolve => {
-    if (!isExist(ASSETS_CACHE_DIR)) {
-      gitClone(ASSETS_ROPE, ASSETS_CACHE_DIR).then(() => resolve());
-    } else {
-      gitPull(ASSETS_CACHE_DIR)
-        .then(() => resolve())
-        .catch(() => resolve()); // git pull 执行失败并不影响用户查看 template list
-    }
-  });
+exports.updateAssetsRepo = async () => {
+  if (!isExist(ASSETS_CACHE_DIR)) {
+    await gitClone(ASSETS_ROPE, ASSETS_CACHE_DIR);
+    return;
+  }
+  await gitPull(ASSETS_CACHE_DIR)
 }
 
 function readConfig() {
-  try {
-    const config = require(path.join(ASSETS_CACHE_DIR, 'config'));
-    debug('%s %o', 'readTemplatesConfig', config);
-    return Promise.resolve(config);
-  } catch (error) {
-    return Promise.reject(error);
-  }
+  const config = require(path.join(ASSETS_CACHE_DIR, 'config'));
+  debug('%s %o', 'readTemplatesConfig', config);
+  return config;
 }
-
-module.exports = {
-  getConfig,
-  updateAssetsRepo,
-};
