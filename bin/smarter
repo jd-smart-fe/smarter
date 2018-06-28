@@ -8,14 +8,13 @@ const { execSync } = require('child_process');
 const { checkVersion } = require('../utils/check-version');
 
 (async () => {
-
   // 先判断是否有新版本
-  const spinner = ora()
-  spinner.start('> check version ... ');
+  // const spinner = ora()
+  // spinner.start('> check version ... ');
 
   // checkVersion(pkg) 返回 {hasNewer:Boolean, remoteVersion, localVersion}
   const versionInfo = await checkVersion('smarter');
-  spinner.stop();
+  // spinner.stop();
 
   // 如果有最新版本了 提示用户
   if (versionInfo.hasNewer) {
