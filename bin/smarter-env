@@ -10,9 +10,6 @@ const ora = require('ora');
 const inquirer = require('inquirer');
 const assets = require('../utils/assets');
 const utils = require('../utils/utils');
-// 安装依赖和 eslint分类的默认值
-let way = '';
-let rc = '';
 
 program
   .usage('[option1 ... optionN]')
@@ -22,58 +19,28 @@ program
   .option('--no-plugins', 'Only generate rules file, do not install plugins.')
   .parse(process.argv);
 
+let way = '';
+
 (() => {
-  if(program.rule) {
-    if(program.rule == true) {
-      help();
-      return;
-    } else {
-      // 在这里进行 elsint 相关环境配置
-      switch (program.rule) {
-        case 'b':
-        case 'browser':
-          rc = 'browserrc';
-          break;
-        case 'r':
-        case 'react':
-          rc = 'reactrc';
-          break;
-        case 'v':
-        case 'vue':
-          rc = 'vuerc';
-          break;
-        case 'n':
-        case 'node':
-        default:
-          rc = 'noderc';
-          break;
-      }
-    }
-  }
-  // 判断使用什么方式安装相关依赖
-  if(program.install) {
-    switch(program.install) {
-      case 'yarn':
-        way = 'yarn';
-        break;
-      case 'cnpm':
-        way = 'cnpm';
-        break;
-      case 'npm':
-      default:
-        way = 'npm';
-        break;
-    }
+  switch(program.install) {
+    case 'yarn':
+      way = 'yarn';
+      break;
+    case 'cnpm':
+      way = 'cnpm';
+      break;
+    case 'npm':
+    default:
+      way = 'npm';
+      break;
   }
 
   if (program.H) {
     help();
     return;
   } else if (program.args.length < 1) { // 没有跟任何参数的话，也自动调用 help()
-    if(!rc) {
-      help();
-      return;
-    }
+    help();
+    return;
   }
 
   function help() {
@@ -86,144 +53,182 @@ program
     console.log('    $ smarter env editorconfig eslint vscode');
   }
 
+  // return;
   assets.getConfig().then(config => {
-    let argsArry = program.args;
-    let argsLength = program.args.length;
-    let argsIndex = 0;
+    let configName = program.args[0];
+    let argsArry = configName == 'all' ?
+      config.envConfig[configName] :
+      program.args;
 
-    if(rc) {
-      const configName = rc;
-      generateEnv(configName);
-      // 是否安装相关依赖
-    } else {
-      // 添加配置文件方法
-      let configName = argsArry[argsIndex];
-      if(configName == 'all') {
-        // 配置所有
-        argsArry = config.envConfig[configName];
-        argsLength = argsArry.length;
-        argsIndex = 0;
-        configName = argsArry[argsIndex];
-      }
-      generateEnv(configName);
-    }
-    process.on('exit', () => {
-      // console.log();
-    });
-
-    function installPlugins(plugins, _way) {
-      const spinner = ora('Downloading eslint plugins');
-      spinner.start();
-      const ways = {
-        npm() {
-          exec('npm i -D ' + plugins.join(' '), callback);
-        },
-
-        cnpm() {
-          exec('cnpm i -D ' + plugins.join(' '), callback);
-        },
-
-        yarn() {
-          exec('yarn add ' + plugins.join(' '), callback);
-        },
-      };
-
-      try {
-        ways[_way]();
-      } catch (error) {
-        spinner.stop();
-        console.log(chalk.red('ways error'));
-        console.log(chalk.red(error));
-      }
-
-      function callback(err, stdout, stderr) {
-        spinner.stop();
-        if (err) { console.log(chalk.red(err)); return; }
-        console.log(chalk.green(stdout));
-        if (stderr) { console.log(chalk.green(stderr)); }
-      }
-    }
-
-    function generateEnv(configName) {
-      const local = path.join(utils.getProjectRootPath(), config.envConfig[configName].target);
-
-      if (!configName) {
-        configName = '.';
-      }
-
-      const inplace = configName === '.';
-
-      if (exists(local)) {
-        // 文件存在
-        inquirer.prompt([{
-          type: 'confirm',
-          message: inplace ? 'Generate file in current directory?'
-            : configName + ' settings file exists. Continue?',
-          name: 'ok',
-        }]).then(answers => {
-          if (answers.ok) {
-            create(configName);
-          } else {
-            argsIndex++;
-            if (argsIndex < argsLength) {
-              const configNames = argsArry[argsIndex];
-              generateEnv(configNames);
-            }
-          }
-        });
-      } else {
-        // 不存在
-        // 判断目标路径是否需要放到文件夹内
-        if (config.envConfig[configName].target.indexOf('/') >= 0) {
-          // 截取文件夹路径，生成不存在的文件夹
-          const localSub = path.dirname(local);
-          fs.mkdirp(localSub, err => {
-            console.log();
-          });
-        }
-        create(configName);
-      }
-    }
-
-    function create(configName) {
-      // 生成 editconfig 文件
-      // 读取本地项目配置文件
-      let datas = '';
-      if(rc) {
-        if(program.plugins) {
-          const plugin = require(config.envConfig[configName].source);
-          installPlugins(plugin.plugins, way);
-        }
-        datas = require(config.envConfig[configName].source).rc;
-        fs.writeFile(path.join(utils.getProjectRootPath(), config.envConfig[configName].target), datas, 'utf8', errs => {
-          if (errs) {
-            console.log(chalk.red(errs));
-          }
-          if (errs) throw chalk.red(errs);
-          console.log(chalk.green('Generate file success'));
-        });
-      } else {
-        datas = config.envConfig[configName].source;
-        fs.readFile(datas, 'utf-8', (err, data) => {
-          if (err) {
-            console.log(err);
-          } else {
-            // 覆盖或新建配置文件
-            fs.writeFile(path.join(utils.getProjectRootPath(), config.envConfig[configName].target), data, 'utf8', errs => {
-              if (err) {
-                console.log(chalk.red(errs));
-              } else {
-                console.log(chalk.green('Generate file success'));
-                argsIndex++;
-                if (argsIndex < argsLength) {
-                  const configNames = argsArry[argsIndex];
-                  generateEnv(configNames);
-                }
-              }
-            });
-          }
-        });
-      }
-    }
+    askAll(argsArry, config)
+      .then(arr => dispatch(argsArry, arr, config));
   });
 })();
+
+async function askAll(argsArry, config) {
+  const answersArr = [];
+
+  for(let i = 0; i < argsArry.length; i ++) {
+    const answer = await ask(argsArry[i], config);
+    answersArr[i] = answer;
+  }
+  return answersArr;
+}
+
+function ask(configName, config) {
+  return new Promise((resolve, reject) => {
+    const local = path.join(utils.getProjectRootPath(), config.envConfig[configName]['original'].target);
+    const inplace = configName === '.';
+
+    if(exists(local)){
+      // 文件存在进行询问
+      inquirer.prompt([{
+        type: 'confirm',
+        message: inplace ? 'Generate file in current directory?'
+          : configName + ' settings file exists. Continue?',
+        name: 'ok',
+      }]).then(answers => {
+        if (answers.ok) {
+          resolve(true);
+        } else {
+          resolve(false);
+        }
+      }).catch(e => { reject(e) });
+    } else {
+      // 文件不存在则创建
+      resolve(true);
+    }
+  });
+}
+
+function dispatch(argsArry, arr, config) {
+  arr.forEach((name, index) => {
+    let typeCategory = argsArry[index];
+    console.log('类型', typeCategory);
+    if(name) {
+      const generator = new Generator({rule: program.rule, way: '', config: config, typeCategory: typeCategory });
+      // generator.init();
+      generator.rcContent();
+    }
+  });
+}
+
+class Generator {
+  constructor({ rule, way, config, typeCategory }) {
+    this.rule = rule;
+    this.way = way;
+    this.config = config;
+    this.typeCategory = typeCategory;
+  }
+
+  init() {
+    console.log('配置名称',this.typeCategory);
+  }
+
+  rcContent() {
+    // 合并后的配置文件路径
+    const newOriginal = getMergedOriginal({
+      config: this.config,
+      configName: this.typeCategory,
+      argsKey: ['rule'],
+      argsValue: [this.rule],
+    });
+    // 开始读写文件
+    // 判断目标路径是否需要放到文件夹内
+    const local = path.join(utils.getProjectRootPath(), newOriginal.target);
+    if (newOriginal.target.indexOf('/') >= 0) {
+      // 截取文件夹路径，生成不存在的文件夹
+      const localSub = path.dirname(local);
+      fs.mkdirp(localSub, err => {
+        console.log(err);
+      });
+    }
+    create(newOriginal);
+  }
+}
+
+// getMergedConfig({config, configName: 'eslint', argsKey: ['rule'], argsValue: ['b'] })
+
+function getMergedOriginal({ config, configName, argsKey, argsValue }) {
+  const selfConfig = config.envConfig[configName];
+  const newOriginal = Object.assign({}, selfConfig.original);
+
+  argsKey.forEach((key, index) => {
+    const value = argsValue[index];
+    if (selfConfig[key] && 'object' === typeof selfConfig[key][value]) {
+      Object.assign(newOriginal, selfConfig[key][value]);
+    }
+  });
+  return newOriginal;
+}
+
+function create(newOriginal) {
+  // 生成 editconfig 文件
+  // 读取本地项目配置文件
+  let datas = '';
+  if(newOriginal.target.indexOf('eslint') > -1) {
+    // 安装相关依赖
+    if(program.plugins) {
+      const plugin = require(newOriginal.source);
+      installPlugins(plugin.plugins, way);
+    }
+    // 读取文件内容
+    datas = require(newOriginal.source).rc;
+    fs.writeFile(path.join(utils.getProjectRootPath(), newOriginal.target), datas, 'utf8', errs => {
+      if (errs) {
+        console.log(chalk.red(errs));
+      }
+      if (errs) throw chalk.red(errs);
+      console.log(chalk.green('Generate file success'));
+    });
+  } else {
+    datas = newOriginal.source;
+    fs.readFile(datas, 'utf-8', (err, data) => {
+      if (err) {
+        console.log(err);
+      } else {
+        // 覆盖或新建配置文件
+        fs.writeFile(path.join(utils.getProjectRootPath(), newOriginal.target), data, 'utf8', errs => {
+          if (err) {
+            console.log(chalk.red(errs));
+          } else {
+            console.log(chalk.green('Generate file success'));
+          }
+        });
+      }
+    });
+  }
+}
+
+function installPlugins(plugins, _way) {
+  const spinner = ora('Downloading eslint plugins');
+  spinner.start();
+  const ways = {
+    npm() {
+      exec('npm i -D ' + plugins.join(' '), callback);
+    },
+
+    cnpm() {
+      exec('cnpm i -D ' + plugins.join(' '), callback);
+    },
+
+    yarn() {
+      exec('yarn add ' + plugins.join(' '), callback);
+    },
+  };
+
+  try {
+    ways[_way]();
+  } catch (error) {
+    spinner.stop();
+    console.log(chalk.red('ways error'));
+    console.log(chalk.red(error));
+  }
+
+  function callback(err, stdout, stderr) {
+    spinner.stop();
+    if (err) { console.log(chalk.red(err)); return; }
+    console.log(chalk.green(stdout));
+    if (stderr) { console.log(chalk.green(stderr)); }
+  }
+}

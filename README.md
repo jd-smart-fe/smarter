@@ -160,7 +160,7 @@ smarter upload -n env_test
 
 example:
 ```bash
-$ smarter env -r react -i npm # 生成 react 的 eslint 配置, 并使用 npm 来安装相关依赖
+$ smarter env eslint -r react -i npm # 生成 react 的 eslint 配置, 并使用 npm 来安装相关依赖
 ```
 
 ### **--no-plugins**
@@ -170,9 +170,8 @@ $ smarter env -r react -i npm # 生成 react 的 eslint 配置, 并使用 npm �
 e.g.
 ```bash
 smarter env vscode # 生成 vscode 配置文件
-smarter env vscode editorconfig # 生成 vscode、 editorconfig 配置文件
-smarter env -r r/react -i node # 生成 vscode、 editorconfig 配置文件
-smarter env all # 生成 vscode、 editorconfig配置文件
+smarter env vscode editorconfig # 生成 vscode、 editorconfig 配置文件，并安装相关依赖
+smarter env all --no-plugins # 仅生成 vscode、 eslint、 editorconfig 配置文件
 ```
 
 ## TODO
