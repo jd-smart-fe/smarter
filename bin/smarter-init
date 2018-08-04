@@ -73,7 +73,7 @@ async function help() {
   console.log();
   console.log('  Examples:');
   console.log();
-  console.log(chalk.cyan('    # 生成一个 React 同构直出的脚手架'));
+  console.log(chalk.gray('    # 生成一个 React 同构直出的脚手架'));
   console.log('    $ smarter init rephic project-dir');
   console.log();
   console.log();

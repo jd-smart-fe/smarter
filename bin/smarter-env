@@ -49,7 +49,7 @@ let way = '';
     console.log();
     console.log('  Examples:');
     console.log();
-    console.log(chalk.cyan('    # 生成 editorconfig eslint vscode 环境配置文件'));
+    console.log(chalk.gray('    # 生成 editorconfig eslint vscode 环境配置文件'));
     console.log('    $ smarter env editorconfig eslint vscode');
   }
 
