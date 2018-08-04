@@ -15,27 +15,36 @@ program
   .parse(process.argv);
 
 (async () => {
-  // 如果用户输入的是 init -h
+  // 如果用户输入的是 init -h, 展示自定义的 help 信息
   if (program.H) {
     await help();
     return;
-  } else if (program.args.length < 1) { // 没有跟任何参数的话，也自动调用 help()
-    await help();
-    return;
   }
 
-  // template name
-  const template = program.args[0];
+  let template = null;  // 模板名称
+  let target = null;    // 目标地址
+  let local = null;     // 目标地址的绝对路径
+  let inplace = null;   // boolean, 目标路径是当前目录？
 
-  // target dir
-  let target = program.args[1];
-  if (!target) {
-    target = '.';
+  // 没有跟任何参数的话，也自动调用 help()
+  if (program.args.length < 1) {
+    const answers = await ask();
+    template = answers.template;
+    target = answers.target;
+
+  } else {
+    // template name
+    template = program.args[0];
+
+    // target dir
+    target = program.args[1];
+    if (!target) {
+      target = './';
+    }
   }
-  const inplace = target === '.';
-  const local = path.resolve(target);
 
-  process.on('exit', () => {});
+  inplace = target === './';
+  local = path.resolve(target);
 
   if (exists(local)) {
     inquirer
@@ -63,7 +72,34 @@ program
   }
 })();
 
+async function ask() {
+  const config = await assets.getConfig()
+  const inquirer = require('inquirer');
 
+  const answers = await inquirer.prompt([{
+    type: 'list',
+    name: 'template',
+    message: 'Which template you want to create?',
+    choices: formatTemplatesList(config.templates),
+    filter(answer) {
+      return /\S*/.exec(answer)[0];
+    }
+  }, {
+    type: 'input',
+    name: 'target',
+    message: 'Target directory',
+    default: './',
+  }]);
+
+  return {
+    template: answers.template,
+    target: answers.target,
+  };
+}
+
+/**
+ * smarter init -h
+ */
 async function help() {
   // return;
   const config = await assets.getConfig();
@@ -80,22 +116,39 @@ async function help() {
   console.log('  Templates List:');
   console.log();
 
-  let maxLength = 0;
-
-  config.templates.forEach(item => {
-    if (item.name.length > maxLength) {
-      maxLength = item.name.length;
-    }
-  });
-
-  config.templates.forEach(item => {
-    console.log(`    * ${item.name.padEnd(maxLength)}    ${item.desc}`);
+  formatTemplatesList(config.templates).forEach(item => {
+    console.log(`    * ${item}`);
   });
 
   console.log();
   process.exit();
 }
 
+/**
+ * 在 template.name 增加 right-pad，为了令右边的描述文字对齐。
+ *
+ * @returns {string[]} 整理完毕的字符串数组
+ */
+function formatTemplatesList(templates) {
+  const newArr = [];
+  let maxLength = 0;
+
+  templates.forEach(item => {
+    if (item.name.length > maxLength) {
+      maxLength = item.name.length;
+    }
+  });
+
+  templates.forEach(item => {
+    newArr.push(`${item.name.padEnd(maxLength)}    ${item.desc}`);
+  });
+
+  return newArr;
+}
+
+/**
+ * Create template.
+ */
 async function create(template, target, local, inplace) {
   const spinner = ora('Downloading template');
   spinner.start();
@@ -110,17 +163,21 @@ async function create(template, target, local, inplace) {
   }
 }
 
+/**
+ * Log some help information after create template success.
+ */
 async function createdTips(target, inplace) {
   const config = await assets.getConfig()
 
   console.log('#', chalk.green('Project initialization finished!'));
   console.log('# ========================');
   console.log();
-  console.log('To get started:');
+  // console.log('To get started:');
+  console.log('To install packages:');
   console.log();
   if (!inplace) {
     console.log(chalk.yellow(`cd ${target}`));
   }
   console.log(chalk.yellow('npm install (or if using yarn: yarn)'));
-  console.log(chalk.yellow(config.templates.devScript || 'npm run dev'));
+  // console.log(chalk.yellow(config.templates.devScript || 'npm run dev'));
 }
